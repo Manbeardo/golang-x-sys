@@ -52,14 +52,7 @@ func relError(file, path string) error {
 // PATH lookup would have returned an executable from the current directory,
 // LookPath instead returns an error.
 func LookPath(file string) (string, error) {
-	path, err := exec.LookPath(file)
-	if err != nil && !isGo119ErrDot(err) {
-		return "", err
-	}
-	if filepath.Base(file) == file && !filepath.IsAbs(path) {
-		return "", relError(file, path)
-	}
-	return path, nil
+	return exec.LookPath(file)
 }
 
 func fixCmd(name string, cmd *exec.Cmd) {
