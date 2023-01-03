@@ -20,6 +20,8 @@ import (
 	"path/filepath"
 	"reflect"
 	"unsafe"
+
+	"golang.org/x/sys/internal/godebug"
 )
 
 // ErrNotFound is the error resulting if a path search failed to find an executable file.
@@ -56,14 +58,14 @@ func LookPath(file string) (string, error) {
 	if err != nil && !isGo119ErrDot(err) {
 		return "", err
 	}
-	if filepath.Base(file) == file && !filepath.IsAbs(path) {
+	if filepath.Base(file) == file && !filepath.IsAbs(path) && godebug.Get("execerrdot") != "0" {
 		return "", relError(file, path)
 	}
 	return path, nil
 }
 
 func fixCmd(name string, cmd *exec.Cmd) {
-	if filepath.Base(name) == name && !filepath.IsAbs(cmd.Path) {
+	if filepath.Base(name) == name && !filepath.IsAbs(cmd.Path) && godebug.Get("execerrdot") != "0" {
 		// exec.Command was called with a bare binary name and
 		// exec.LookPath returned a path which is not absolute.
 		// Set cmd.lookPathErr and clear cmd.Path so that it
